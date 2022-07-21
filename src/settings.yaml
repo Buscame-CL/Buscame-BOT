@@ -1,0 +1,562 @@
+migrations:
+  - from: currency/honkos/database-url
+    to: currency/mysql/url
+  - from: song/youtube/support
+    to: song/youtube/enabled
+  - from: irc/startup-message
+    to: chat/join-message
+  - prefix: true
+    from: irc/
+    to: chat/
+
+# ChaosMod effect names that can be configured.
+gtav_options: &gtav-options
+  - {title: "Spawn Vehicle", value: "SpawnVehicle"}
+  - {title: "Spawn Random Vehicle", value: "SpawnRandomVehicle"}
+  - {title: "Kill Engine", value: "KillEngine"}
+  - {title: "Blow Tires", value: "BlowTires"}
+  - {title: "Repair", value: "Repair"}
+  - {title: "Give Weapon", value: "GiveWeapon"}
+  - {title: "Take Weapon", value: "TakeWeapon"}
+  - {title: "Take All Weapons", value: "TakeAllWeapons"}
+  - {title: "Stumble", value: "Stumble"}
+  - {title: "Fall", value: "Fall"}
+  - {title: "Clear Wanted Level", value: "ClearWanted"}
+  - {title: "Give Wanted Level", value: "Wanted"}
+  - {title: "Give Health", value: "GiveHealth"}
+  - {title: "Give Armor", value: "GiveArmor"}
+  - {title: "Take Health", value: "TakeHealth"}
+  - {title: "License", value: "License"}
+  - {title: "Randomize Color", value: "RandomizeColor"}
+  - {title: "Randomize Weather", value: "RandomizeWeather"}
+  - {title: "Randomize Character", value: "RandomizeCharacter"}
+  - {title: "Brake", value: "Brake"}
+  - {title: "Take Ammo", value: "TakeAmmo"}
+  - {title: "Give Ammo", value: "GiveAmmo"}
+  - {title: "Boost", value: "Boost"}
+  - {title: "Super Boost", value: "SuperBoost"}
+  - {title: "Super Speed", value: "SuperSpeed"}
+  - {title: "Super Swim", value: "SuperSwim"}
+  - {title: "Super Jump", value: "SuperJump"}
+  - {title: "Invincibility", value: "Invincibility"}
+  - {title: "Spawn Enemy", value: "SpawnEnemy"}
+  - {title: "Exploding Bullets", value: "ExplodingBullets"}
+  - {title: "Fire Ammo", value: "FireAmmo"}
+  - {title: "Exploding Punches", value: "ExplodingPunches"}
+  - {title: "Drunk", value: "Drunk"}
+  - {title: "Very Drunk", value: "VeryDrunk"}
+  - {title: "Set On Fire", value: "SetOnFire"}
+  - {title: "Set Peds On Fire", value: "SetPedsOnFire"}
+  - {title: "Make Peds Aggressive", value: "MakePedsAggressive"}
+  - {title: "Matrix Slam", value: "MatrixSlam"}
+  - {title: "Close Parachute", value: "CloseParachute"}
+  - {title: "Disable Control", value: "DisableControl"}
+  - {title: "Mod Vehicle", value: "ModVehicle"}
+  - {title: "Levitate", value: "Levitate"}
+  - {title: "Levitate Entities", value: "LevitateEntities"}
+  - {title: "Eject", value: "Eject"}
+  - {title: "Slow Down Time", value: "SlowDownTime"}
+  - {title: "Make Fireproof", value: "MakeFireProof"}
+  - {title: "Fuel Leakage", value: "FuelLeakage"}
+  - {title: "Change Current Vehicle", value: "ChangeCurrentVehicle"}
+  - {title: "Randomize Doors", value: "RandomizeDoors"}
+  - {title: "Skyfall", value: "Skyfall"}
+  - {title: "Taze", value: "Taze"}
+  - {title: "Taze Others", value: "TazeOthers"}
+  - {title: "Reduce Gravity", value: "ReduceGravity"}
+  - {title: "Raw", value: "Raw"}
+
+types:
+  pubsub/enabled:
+    doc: >
+      If Twitch Pub/Sub support is enabled or not.
+      
+      This is required to use points redemption features:
+        * `song/request-redemption`
+    type: {id: bool}
+  system/run-on-startup:
+    doc: >
+      If SetMod should run on startup.
+    type: {id: bool}
+  remote/check-interval:
+    doc: The interval at which to check for remote updates to connections.
+    type: {id: duration}
+  remote/api-url:
+    doc: Endpoint to use for sending API updates to. One is provided for free at `https://setbac.tv`.
+    type: {id: string, optional: true}
+  remote/secret-key:
+    doc: Secret key to use to authenticate against remote API.
+    type: {id: string, optional: true}
+    secret: true
+  remote/enabled:
+    title: Remote Updates
+    feature: true
+    doc: >
+      If remote updates are enabled.
+      For example, to update player information on <https://setbac.tv>.
+    type: {id: bool}
+  first-run:
+    doc: Indicates whether the bot has run at least once.
+    type: {id: bool}
+  gtav/command-configs:
+    doc: >
+      **Experimental** support for command-specific configuration overrides.
+      An example override looks like this: `{"name": "Wanted", "enabled": true, "cost": 10000, "cooldown": "5m"}`.
+      [Available names](https://github.com/udoprog/OxidizeBot/blob/main/bot/src/module/gtav.rs#L208).
+    type:
+      id: set
+      value:
+        id: object
+        fields:
+        - title: Enabled
+          field: enabled
+          type: {id: bool, optional: true}
+        - title: Name
+          field: name
+          type: {id: select, variant: "typeahead", value: {id: string}, options: *gtav-options}
+        - title: Cooldown
+          field: cooldown
+          type: {id: duration, optional: true}
+        - title: Cost
+          field: cost
+          type: {id: number, optional: true}
+  gtav/enabled:
+    title: ChaosMod
+    feature: true
+    doc: If the `!gtav` module is enabled.
+    type: {id: bool}
+  gtav/chat-prefix:
+    doc: Prefix to use when announcing effects.
+    type: {id: string}
+  gtav/cooldown:
+    doc: Global cooldown between each effect.
+    type: {id: duration}
+  gtav/punish-cooldown:
+    doc: Punishment cooldown between each effect.
+    type: {id: duration}
+  gtav/reward-cooldown:
+    doc: Reward cooldown between each effect.
+    type: {id: duration}
+  gtav/per-user-cooldown:
+    doc: Per-user cooldown between each effect.
+    type: {id: duration}
+  gtav/per-command-cooldown:
+    doc: Per-command cooldown between each effect.
+    type: {id: duration}
+  gtav/other%:
+    doc: Other effect cost scaling.
+    type: {id: percentage}
+  gtav/punish%:
+    doc: Punishment scaling.
+    type: {id: percentage}
+  gtav/reward%:
+    doc: Reward cost scaling.
+    type: {id: percentage}
+  gtav/success-feedback:
+    doc: If we should have chat feedback on successful commands.
+    type: {id: bool}
+  chat/sender-type:
+    doc: How to send messages to chat.
+    type:
+      id: select
+      value: {id: string}
+      options:
+        - {title: "Chat", value: "chat"}
+        - {title: "NightBot (requires Authentication)", value: "nightbot"}
+  chat/moderator-cooldown:
+    doc: How long we must wait between each moderator action.
+    type: {id: duration, optional: true}
+  chat/join-message:
+    doc: Message to send when the bot joins your channel.
+    type: {id: string, optional: true}
+  chat/leave-message:
+    doc: Message to send when the bot leaves your channel.
+    type: {id: string, optional: true}
+  chat/idle-detection/threshold:
+    doc: How many messages must be received before the channel is no longer considered idle.
+    type: {id: number}
+  chat/viewer-reward%:
+    doc: Scaling for viewer rewards.
+    type: {id: percentage}
+  chat/viewer-reward/enabled:
+    title: Viewer Rewards
+    feature: true
+    doc: If viewer rewards are enabled. If enabled, this will award viewers 1 unit of stream currency for every minute of watch time.
+    type: {id: bool}
+  chat/viewer-reward/interval:
+    doc: The interval at which we give out user rewards.
+    type: {id: duration}
+  chat/whitelisted-hosts:
+    doc: Hosts that are whitelisted for linking to in chat.
+    type: {id: set, value: {id: string}}
+  chat/url-whitelist/enabled:
+    title: URL whitelisting
+    feature: true
+    doc: If URL whitelisting is enabled in chat.
+    type: {id: bool}
+  chat/bad-words/enabled:
+    title: Bad-words filtering
+    feature: true
+    doc: If bad words filtering is enabled in chat (Experimental).
+    type: {id: bool}
+  chat/bad-words/path:
+    doc: Filesystem location of the bad words dictionary to use.
+    type: {id: string, optional: true}
+  migration/aliases-migrated:
+    doc: If aliases have been migrated from the configuration file.
+    type: {id: bool}
+  migration/whitelisted-hosts-migrated:
+    doc: If whitelisted hosts have been migrated from the configuration file.
+    type: {id: bool}
+  migration/themes-migrated:
+    doc: If themes have been migrated from the configuration file.
+    type: {id: bool}
+  player/fallback-uri:
+    doc: >
+      The fallback URI (Spotify) to use when no other songs are queued up.
+      Removing this setting causes the bot to use your starred songs.
+      Example: `spotify:playlist:1ZTlxhxQ4FGJdUMBEd9pn`
+    type: {id: string, optional: true}
+  player/duplicate-duration:
+    doc: The minimum amount of time that has to have been passed to allow adding a song that has already been queued.
+    type: {id: duration}
+  player/detached:
+    doc: If the player is detached, in that it can no longer control the music.
+    type: {id: bool}
+    scope: player/attach-detach
+  player/song-switch-feedback:
+    doc: Echo when the current song switches in chat.
+    type: {id: bool}
+  player/max-queue-length:
+    doc: The maximum queue length permitted in the player.
+    type: {id: number}
+  player/max-songs-per-user:
+    doc: The maximum number of songs that can be requested per user.
+    type: {id: number}
+  player/song-update-interval:
+    doc: The interval at which song updates are visible. Used in the Overlay.
+    type: {id: duration}
+  player/spotify/volume:
+    doc: Volume to use for the Spotify player.
+    type: {id: percentage}
+  player/spotify/volume-scale:
+    doc: Scaling to apply to volume. A value of 50% would mean that that would effectively be the maximum volume.
+    type: {id: percentage}
+  player/spotify/device:
+    doc: ID of the device configured for playback.
+    type: {id: string, optional: true}
+  player/youtube/volume:
+    doc: Volume to use for the YouTube player.
+    type: {id: percentage}
+  player/youtube/volume-scale:
+    doc: Scaling to apply to volume. A value of 50% would mean that that would effectively be the maximum volume.
+    type: {id: percentage}
+  player/song-file/enabled:
+    title: Song file
+    feature: true
+    doc: >
+      If file-based current song information is enabled.
+    type: {id: bool}
+  player/song-file/path:
+    doc: The path to write the current song information to.
+    type: {id: string, optional: true}
+  player/song-file/update-interval:
+    doc: How frequently the file is updated.
+    type: {id: duration}
+  player/song-file/template:
+    doc: Template to use for current song.
+    type: {id: text, optional: true}
+  player/song-file/stopped-template:
+    doc: Template to use when the player doesn't have any songs loaded.
+    type: {id: text, optional: true}
+  player/playback-mode:
+    doc: >
+      How playback is performed.
+
+      The available modes are:
+        * **Default** - Where the player uses the default method of playback.
+        * **Queue** - The player tries to use the Spotify queue instead of the
+          internal one. This has some limitations documented below.
+
+      **Queue** has the following limitations:
+        * Remote song updates will not be sent.
+        * We will not be able to maintain queue-based request limits, like
+          limiting a user to only be allowed to have a certain number of songs
+          in the queue.
+        * Fallback songs will not be used, instead it will use whatever is in
+          the player queue.
+    type:
+      id: select
+      value: {id: string}
+      options:
+        - {title: "Default", value: "default"}
+        - {title: "Queue (Spotify playback only)", value: "queue"}
+  promotions/enabled:
+    title: Promotions
+    feature: true
+    doc: If the `!promo` module is enabled.
+    type: {id: bool}
+  promotions/frequency:
+    doc: The highest frequency at which promotions are posted.
+    type: {id: duration}
+  swearjar/enabled:
+    title: Swear Jar
+    feature: true
+    doc: If the `!swearjar` module is enabled.
+    type: {id: bool}
+  swearjar/reward:
+    doc: The amount of currency each user is rewarded by the `!swearjar` command.
+    type: {id: number}
+  swearjar/cooldown:
+    doc: Minimum cooldown between each `!swearjar` invocation.
+    type: {id: duration}
+  secrets/oauth2/spotify/connection:
+    doc: Stored connection for Spotify authentication.
+    type: {id: raw, optional: true}
+    secret: true
+  secrets/oauth2/twitch-bot/connection:
+    doc: Stored connection for Twitch Bot authentication.
+    type: {id: raw, optional: true}
+    secret: true
+  secrets/oauth2/twitch-streamer/connection:
+    doc: Stored connection for Twitch Streamer authentication.
+    type: {id: raw, optional: true}
+    secret: true
+  secrets/oauth2/youtube/connection:
+    doc: Stored connection for YouTube authentication.
+    type: {id: raw, optional: true}
+    secret: true
+  secrets/oauth2/nightbot/connection:
+    doc: Stored connection for NightBot authentication.
+    type: {id: raw, optional: true}
+    secret: true
+  song/enabled:
+    title: Song Requests
+    feature: true
+    doc: If the `!song` module is enabled.
+    type: {id: bool}
+  song/chat-feedback:
+    doc: If song feedback is visible in chat or not.
+    type: {id: bool}
+  song/request-reward:
+    doc: Fixed reward that anyone gets for requesting songs.
+    type: {id: number}
+  song/subscriber-only:
+    doc: If only subscribers can request songs.
+    type: {id: bool}
+  song/spotify/enabled:
+    title: Spotify Song Requests
+    feature: true
+    doc: If we accept Spotify song requests.
+    type: {id: bool}
+  song/spotify/min-currency:
+    doc: >
+      The minimum amount of stream currency required to request Spotify songs.
+      Setting this value to anything by `0` requires that stream currency is configured.
+    type: {id: number}
+  song/spotify/max-duration:
+    doc: >
+      The longest duration we will accept for a Spotify songs. Any longer will be capped.
+      Remove this value to allow requests of any length.
+    type: {id: duration, optional: true}
+  song/spotify/subscriber-only:
+    doc: >
+      If only subscribers can request songs from Spotify.
+      **Deprecated** in favor of `song/spotify` scope (see Authentication).
+    type: {id: bool, optional: true}
+  song/youtube/enabled:
+    title: YouTube Song Requests
+    feature: true
+    doc: If we accept YouTube song requests (Experimental).
+    type: {id: bool}
+  song/youtube/min-currency:
+    doc: >
+      The minimum amount of stream currency required to request YouTube songs.
+      Setting this value to anything by `0` requires that stream currency is configured.
+    type: {id: number}
+  song/youtube/max-duration:
+    doc: >
+      The longest duration we will accept for a YouTube video. Any longer will be capped.
+      Remove this value to allow requests of any length.
+    type: {id: duration, optional: true}
+  song/youtube/min-currency:
+    doc: >
+      The minimum amount of stream currency required to request YouTube songs.
+      Remove this value to allow requests of any length.
+    type: {id: number}
+  song/youtube/subscriber-only:
+    doc: >
+      If only subscribers can request songs from YouTube.
+      **Deprecated** in favor of `song/spotify` scope (see Authentication).
+    type: {id: bool, optional: true}
+  song/request-redemption:
+    doc: >
+      The title of a points redemption that can be used to request songs.
+      Requires Twitch Pub/Sub support to be enbled through `pubsub/enabled`.
+    type: {id: string, optional: true}
+  water/enabled:
+    title: Water Reminders
+    feature: true
+    doc: If the `!water` module is enabled.
+    type: {id: bool}
+  water/cooldown:
+    doc: Cooldown between each `!water` command.
+    type: {id: duration}
+  water/reward%:
+    doc: Reward scaling for doing a water reminder.
+    type: {id: percentage}
+  countdown/enabled:
+    title: Countdowns
+    feature: true
+    doc: If the `!countdown` module is enabled.
+    type: {id: bool}
+  countdown/path:
+    doc: The path used for writing the countdown.
+    type: {id: string, optional: true}
+  currency/type:
+    doc: The type of the stream currency. Decides the backend implementation.
+    type:
+      id: select
+      value: {id: string}
+      options:
+        - {title: "Built-In", value: "builtin"}
+        - {title: "MySQL", value: "mysql"}
+        - {title: "Honkos", value: "honkos"}
+  currency/mysql/url:
+    doc: >
+      The database URL to connect to for the `mysql` or `honkos` backend.
+      Expected: `mysql://<user>:<password>@<host>/<database>`.
+    type:
+      id: string
+      optional: true
+      placeholder: "mysql://<user>:<password>@<host>/<database>"
+      format: {type: "regex", pattern: "^mysql:\\/\\/(.+:.+@)?.+/.+$"}
+    secret: true
+  currency/mysql/schema:
+    doc: Custom schema to use for `mysql` type backends.
+    type: {id: raw}
+  currency/enabled:
+    title: Stream Currency
+    feature: true
+    doc: If stream currency is enabled.
+    type: {id: bool}
+  currency/command-enabled:
+    title: Stream Currency Command
+    feature: true
+    doc: >
+      If the `!<currency>` command is enabled.
+      This is used to for example check your balance or transfer funds.
+    type: {id: bool}
+  currency/name:
+    doc: The name used for the current stream currency.
+    type: {id: string, optional: true}
+  currency/notify-rewards:
+    doc: Send a global notification on viewer rewards.
+    type: {id: bool}
+  obs/url:
+    doc: The URL to use when connecting to OBS.
+    type: {id: string, optional: true}
+  uptime/enabled:
+    title: Uptime Command
+    feature: true
+    doc: If the `!uptime` command is enabled.
+    type: {id: bool}
+  game/enabled:
+    title: Game Command
+    feature: true
+    doc: If the `!game` command is enabled.
+    type: {id: bool}
+  title/enabled:
+    title: Title Command
+    feature: true
+    doc: If the `!title` command is enabled.
+    type: {id: bool}
+  afterstream/enabled:
+    title: After Streams
+    feature: true
+    doc: If the `!afterstream` command is enabled.
+    type: {id: bool}
+  afterstream/cooldown:
+    doc: Required cooldown between each `!afterstream` call.
+    type: {id: duration}
+  clip/enabled:
+    title: Clip Command
+    feature: true
+    doc: If the `!clip` command is enabled.
+    type: {id: bool}
+  clip/cooldown:
+    doc: Required cooldown between each `!clip` call.
+    type: {id: duration}
+  8ball/enabled:
+    title: 8 Ball Command
+    feature: true
+    doc: If the `!8ball` command is enabled.
+    type: {id: bool}
+  command/enabled:
+    title: Command Administration
+    feature: true
+    doc: If the `!command` command is enabled. It's used for custom command administration.
+    type: {id: bool}
+  speedrun/enabled:
+    title: speedrun.com command
+    feature: true
+    doc: If the `!speedrun` command is enabled.
+    type: {id: bool}
+  speedrun/top:
+    doc: "How many top runs to fetch (default: 20)."
+    type: {id: number}
+  time/enabled:
+    title: Time Command
+    feature: true
+    doc: If the `!time` command is enabled.
+    type: {id: bool}
+  time/timezone:
+    doc: Time zone for the `!time` command.
+    type: {id: "time-zone"}
+  time/template:
+    doc: Template to use as a response.
+    type: {id: string}
+  poll/enabled:
+    title: Polling
+    feature: true
+    doc: If the `!poll` command is enabled.
+    type: {id: bool}
+  weather/enabled:
+    title: Weather Information
+    feature: true
+    doc: If the `!weather` command is enabled.
+    type: {id: bool}
+  weather/api-key:
+    doc: API-key to [OpenWeatherMap](https://openweathermap.org). You'll have to register an account.
+    type: {id: string, optional: true}
+    secret: true
+  weather/temperature-unit:
+    doc: Temperature unit to use.
+    type:
+      id: select
+      value: {id: string}
+      options:
+        - {title: "Degrees Celsius (°C)", value: "degrees-celsius"}
+        - {title: "Degrees Fahrenheit (°F)", value: "degrees-fahrenheit"}
+        - {title: "Kelvin (K)", value: "kelvin"}
+  weather/location:
+    doc: Default location to use. Like `New York`, or `Stockholm`.
+    type: {id: string, optional: true}
+  chat-log/enabled:
+    doc: Store a number of messages in the chat log (experimental).
+    type: {id: bool}
+  chat-log/emotes-enabled:
+    doc: Render emotes in the chat log (experimental).
+    type: {id: bool}
+  help/enabled:
+    title: Help Command
+    feature: true
+    doc: >
+      If the `!help` command is enabled or not.
+    type: {id: bool}
+  help/url:
+    title: Documentation URL
+    doc: >
+      The URL to base the `!help` command from.
+      Default is <https://setbac.tv>.
+    type: {id: string}
